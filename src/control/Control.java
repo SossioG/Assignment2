@@ -12,7 +12,6 @@ public class Control {
     // Constructor
     public Control() {
         seatManager = new SeatManager(this);
-        seatManager.pickRandomSeats();
     }
 
     // This is start method

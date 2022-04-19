@@ -17,10 +17,16 @@ public class SeatManager {
     private final int availableSeats = 5;
     private final int maxClients = 15;
     private ArrayList takenSeat;
+    private Client client;
 
     // Constructor
     public SeatManager(Control control){
+        pickRandomSeats();
         this.control = control;
+        client = new Client(this, 12);
+        Thread thead = new Thread(client);
+        thead.start();
+
     }
 
     // Select 5 random number without duplicate between 0 and 10
@@ -55,5 +61,19 @@ public class SeatManager {
         }
 
         return  result;
+    }
+
+    public int getSeatId(){
+        for (int i = 0; i <seats.size(); i++){
+            if (seats.get(i).getSeatStatus().equals(Status.Available)){
+                seats.get(i).setSeatStatus(Status.Occupied);
+                return seats.get(i).getSeatId();
+
+            }else {
+                return -1;
+            }
+
+        }
+        return -1;
     }
 }
