@@ -2,7 +2,10 @@ package model;
 
 import control.Control;
 
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -17,15 +20,24 @@ public class SeatManager {
     private final int availableSeats = 5;
     private final int maxClients = 15;
     private List<Seat> takenSeat;
-    private Client client;
+    private Client client, client1, client2, client3;
+    private Thread thread;
 
     // Constructor
     public SeatManager(Control control){
         pickRandomSeats();
         this.control = control;
-        client = new Client(this, 12);
-        Thread thead = new Thread(client);
-        thead.start();
+
+         client = new Client(this, 1, "client1");
+        new Thread(client).start();
+         client1 = new Client(this, 1, " client2");
+        new Thread(client1).start();
+
+         client2 = new Client(this, 1, " client3");
+        new Thread(client2).start();
+
+         client3 = new Client(this, 1, " client4");
+        new Thread(client3).start();
 
     }
 
@@ -54,28 +66,43 @@ public class SeatManager {
     }
 
     /////// get status ////////
-    public String printStatus(){
+    public void printStatus(){
         String result = "";
-        for (Seat seat: seats) {
+        for (Seat seat: takenSeat) {
             result = seat.toString();
             logBook.add(result);
         }
-        return  result;
     }
 
-    public int getSeatId(){
+    public int getSeatId(int id){
         int output = 0;
-        System.out.println();
+        if (takenSeat.get(id).getSeatStatus().equals(Status.Available)){
+            takenSeat.get(id).setSeatStatus(Status.Occupied);
+            System.out.println("thread: " +  "" +"seat has been taken." + id + " time: " + LocalTime.now());
+            output= id;
+        }else {
+            System.out.println("thread: " +""+" could");
+            output = -1;
+        }
+
+        /*
+
+        System.out.println("size: " + takenSeat.size());
         for (Seat seat : takenSeat) { // doesn't go inside the loop
-            System.out.println(" loop");
             if (seat.getSeatStatus().equals(Status.Available)) {
                 seat.setSeatStatus(Status.Occupied);
                 output = seat.getSeatId();
+                //printStatus();
+                logBook.add(seat.toString());
+                System.out.println("status: " + seat.getSeatStatus());
             } else {
+                System.out.println("status: " + seat.getSeatStatus());
                 output = -1;
             }
 
         }
+
+         */
         return output;
     }
 }

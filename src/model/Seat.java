@@ -25,9 +25,4 @@ public class Seat {
         this.seatStatus = seatStatus;
     }
 
-    @Override
-    public String toString() {
-        return "Seat{" +
-                "seatId=" + seatId +'}';
-    }
 }
