@@ -16,7 +16,7 @@ public class SeatManager {
     private final int maxSeats = 10;
     private final int availableSeats = 5;
     private final int maxClients = 15;
-    private ArrayList takenSeat;
+    private List<Seat> takenSeat;
     private Client client;
 
     // Constructor
@@ -30,23 +30,24 @@ public class SeatManager {
     }
 
     // Select 5 random number without duplicate between 0 and 10
-    public void pickRandomSeats(){
+    public boolean pickRandomSeats(){
         takenSeat = getRandomNonRepeatingIntegers(availableSeats, 0, maxSeats);
         for (int i = 0; i < takenSeat.size(); i++) {
             System.out.println("" + takenSeat.get(i));
         }
+        return true;
     }
 
     // Get selected size number without duplicate
-    public ArrayList getRandomNonRepeatingIntegers(int size, int min, int max) {
-        ArrayList numbers = new ArrayList();
+    public List<Seat> getRandomNonRepeatingIntegers(int size, int min, int max) {
+        List<Seat> numbers = new ArrayList<>();
         Random random = new Random();
         while (numbers.size() < size) {
             //Get Random numbers between range
             int randomNumber = random.nextInt((max - min) + 1) + min;
             //Check for duplicate values
             if (!numbers.contains(randomNumber)) {
-                numbers.add(randomNumber);
+                numbers.add(new Seat(randomNumber, Status.Available));
             }
         }
         return numbers;
@@ -59,21 +60,22 @@ public class SeatManager {
             result = seat.toString();
             logBook.add(result);
         }
-
         return  result;
     }
 
     public int getSeatId(){
-        for (int i = 0; i <seats.size(); i++){
-            if (seats.get(i).getSeatStatus().equals(Status.Available)){
-                seats.get(i).setSeatStatus(Status.Occupied);
-                return seats.get(i).getSeatId();
-
-            }else {
-                return -1;
+        int output = 0;
+        System.out.println();
+        for (Seat seat : takenSeat) { // doesn't go inside the loop
+            System.out.println(" loop");
+            if (seat.getSeatStatus().equals(Status.Available)) {
+                seat.setSeatStatus(Status.Occupied);
+                output = seat.getSeatId();
+            } else {
+                output = -1;
             }
 
         }
-        return -1;
+        return output;
     }
 }
