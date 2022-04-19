@@ -1,7 +1,8 @@
-import control.Controller;
+import control.Control;
 
 public class Main {
     public static void main(String[] args) {
-        new Controller();
+        Control control = new Control();
+        control.start();
     }
 }
