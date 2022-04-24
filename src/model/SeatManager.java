@@ -1,57 +1,56 @@
 package model;
 
 import control.Control;
+import view.View;
 
-import java.sql.Time;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 public class SeatManager {
-
-    Control control;
-
+    private Control control;
+    private View view;
     private List<Seat> seats = new ArrayList<>();
     private List<String> logBook = new ArrayList<>();
-
     private final Object lock = new Object();
     private  Random random;
     private final int maxSeats = 10;
     private final int availableSeats = 5;
     private final int maxClients = 15;
     private List<Seat> takenSeat = new ArrayList<>();
+    private HashMap<Integer,String> notReachedClientList = new HashMap<Integer, String>();
 
     // Constructor
     public SeatManager(Control control){
-        boolean readyToPick = pickRandomSeats();
         this.control = control;
+        this.view = new View(this);
+        boolean readyToPick = pickRandomSeats();
         if (readyToPick){
-            new Client(this, 1, "client1");
-            new Client(this, 1, "client2");
-            new Client(this, 1, "client3");
-            new Client(this, 1, "client4");
-            new Client(this, 1, "client5");
-            new Client(this, 1, "client6");
-            new Client(this, 1, "client7");
-            new Client(this, 1, "client8");
-            new Client(this, 1, "client9");
-            new Client(this, 1, "client10");
+            new Client(this, 1, "client 1");
+            new Client(this, 1, "client 2");
+            new Client(this, 6, "client 3");
+            new Client(this, 6, "client 4");
+            new Client(this, 3, "client 5");
+            new Client(this, 1, "client 6");
+            new Client(this, 3, "client 7");
+            new Client(this, 1, "client 8");
+            new Client(this, 4, "client 9");
+            new Client(this, 1, "client 10");
         }
     }
 
     // Select 5 random number without duplicate between 0 and 10
     public boolean pickRandomSeats(){
         takenSeat.add(new Seat(1,Status.Available));
-        takenSeat.add(new Seat(5,Status.Available));
+        takenSeat.add(new Seat(2,Status.Available));
         takenSeat.add(new Seat(3,Status.Available));
-        takenSeat.add(new Seat(9,Status.Available));
         takenSeat.add(new Seat(4,Status.Available));
-        /*takenSeat = getRandomNonRepeatingIntegers(availableSeats, 0, maxSeats);
-        for (int i = 0; i < takenSeat.size(); i++) {
-            System.out.println("available seats: " + takenSeat.get(i).getSeatId());
-        }*/
+        takenSeat.add(new Seat(5,Status.Available));
+
+        //takenSeat = getRandomNonRepeatingIntegers(availableSeats, 0, maxSeats);
+        view.printAvailableSeats(takenSeat);
+
         return true;
     }
 
@@ -78,25 +77,31 @@ public class SeatManager {
             logBook.add(result);
         }
     }
-
+    private String noSeat = "";
     public int getSeatId(int id, String name){
         synchronized (lock){
+            System.out.println("Thread " + name + " take lock");
         int output = 0;
             for (int i =0; i < availableSeats; i++){
                 if (takenSeat.get(i).getSeatId() == id){
-                    System.out.println(takenSeat.get(i).getSeatId() +" = " + id);
                     if (takenSeat.get(i).getSeatStatus().equals(Status.Available)){
                         takenSeat.get(i).setSeatStatus(Status.Occupied);
                         output= id;
-                        System.out.println("Available seat place "+ id+"  for thread: " + name);
+                        view.printTakenSeat(id, name);
                     }else {
-                        System.out.println("no seat place "+ id+" available for thread: " + name);
-                        output = -1;
+                        if (!notReachedClientList.containsValue(name)){
+                            notReachedClientList.put(id, name);
+                            output = -1;
+                        }
                     }
                 }else {
-                    System.out.println("no seat place "+ id+" available for thread: " + name);
                 }
             }
+            if (notReachedClientList.size() > 0){
+                view.printClientInfo(notReachedClientList);
+            }
+            System.out.println("Thread " + name + " leaved lock");
+
             return output;
         }
     }
