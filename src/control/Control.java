@@ -56,4 +56,7 @@ public class Control {
         String input = myObj.nextLine();
         return input;
     }
+
+
+    // user interface
 }

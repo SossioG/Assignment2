@@ -10,22 +10,19 @@ public class Client extends Thread{
         this.id = id;
         this.sm = sm;
         this.name = name;
+        start();
     }
-
 
     public void run(){
         while (!Thread.interrupted()){
             try {
-                Thread.sleep(1000);
-                int x = sm.getSeatId(1);
-                System.out.println("x: " + x);
-                if (x == -1){
-                    System.out.println("No seats available");
-                    break;
-                }else {
-                    System.out.println(name + ": have taken seat: " + x);
-                    break;
-                }
+                    Thread.sleep(100);
+                    int x = sm.getSeatId(id, name);
+                    if (x == -1){
+                        break;
+                    }else {
+                        break;
+                    }
             }catch (Exception e){
                 e.printStackTrace();
             }

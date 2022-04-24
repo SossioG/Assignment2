@@ -16,44 +16,49 @@ public class SeatManager {
     private List<Seat> seats = new ArrayList<>();
     private List<String> logBook = new ArrayList<>();
 
+    private final Object lock = new Object();
+    private  Random random;
     private final int maxSeats = 10;
     private final int availableSeats = 5;
     private final int maxClients = 15;
-    private List<Seat> takenSeat;
-    private Client client, client1, client2, client3;
-    private Thread thread;
+    private List<Seat> takenSeat = new ArrayList<>();
 
     // Constructor
     public SeatManager(Control control){
-        pickRandomSeats();
+        boolean readyToPick = pickRandomSeats();
         this.control = control;
-
-         client = new Client(this, 1, "client1");
-        new Thread(client).start();
-         client1 = new Client(this, 1, " client2");
-        new Thread(client1).start();
-
-         client2 = new Client(this, 1, " client3");
-        new Thread(client2).start();
-
-         client3 = new Client(this, 1, " client4");
-        new Thread(client3).start();
-
+        if (readyToPick){
+            new Client(this, 1, "client1");
+            new Client(this, 1, "client2");
+            new Client(this, 1, "client3");
+            new Client(this, 1, "client4");
+            new Client(this, 1, "client5");
+            new Client(this, 1, "client6");
+            new Client(this, 1, "client7");
+            new Client(this, 1, "client8");
+            new Client(this, 1, "client9");
+            new Client(this, 1, "client10");
+        }
     }
 
     // Select 5 random number without duplicate between 0 and 10
     public boolean pickRandomSeats(){
-        takenSeat = getRandomNonRepeatingIntegers(availableSeats, 0, maxSeats);
+        takenSeat.add(new Seat(1,Status.Available));
+        takenSeat.add(new Seat(5,Status.Available));
+        takenSeat.add(new Seat(3,Status.Available));
+        takenSeat.add(new Seat(9,Status.Available));
+        takenSeat.add(new Seat(4,Status.Available));
+        /*takenSeat = getRandomNonRepeatingIntegers(availableSeats, 0, maxSeats);
         for (int i = 0; i < takenSeat.size(); i++) {
-            System.out.println("" + takenSeat.get(i));
-        }
+            System.out.println("available seats: " + takenSeat.get(i).getSeatId());
+        }*/
         return true;
     }
 
     // Get selected size number without duplicate
     public List<Seat> getRandomNonRepeatingIntegers(int size, int min, int max) {
         List<Seat> numbers = new ArrayList<>();
-        Random random = new Random();
+        random = new Random();
         while (numbers.size() < size) {
             //Get Random numbers between range
             int randomNumber = random.nextInt((max - min) + 1) + min;
@@ -74,35 +79,25 @@ public class SeatManager {
         }
     }
 
-    public int getSeatId(int id){
+    public int getSeatId(int id, String name){
+        synchronized (lock){
         int output = 0;
-        if (takenSeat.get(id).getSeatStatus().equals(Status.Available)){
-            takenSeat.get(id).setSeatStatus(Status.Occupied);
-            System.out.println("thread: " +  "" +"seat has been taken." + id + " time: " + LocalTime.now());
-            output= id;
-        }else {
-            System.out.println("thread: " +""+" could");
-            output = -1;
-        }
-
-        /*
-
-        System.out.println("size: " + takenSeat.size());
-        for (Seat seat : takenSeat) { // doesn't go inside the loop
-            if (seat.getSeatStatus().equals(Status.Available)) {
-                seat.setSeatStatus(Status.Occupied);
-                output = seat.getSeatId();
-                //printStatus();
-                logBook.add(seat.toString());
-                System.out.println("status: " + seat.getSeatStatus());
-            } else {
-                System.out.println("status: " + seat.getSeatStatus());
-                output = -1;
+            for (int i =0; i < availableSeats; i++){
+                if (takenSeat.get(i).getSeatId() == id){
+                    System.out.println(takenSeat.get(i).getSeatId() +" = " + id);
+                    if (takenSeat.get(i).getSeatStatus().equals(Status.Available)){
+                        takenSeat.get(i).setSeatStatus(Status.Occupied);
+                        output= id;
+                        System.out.println("Available seat place "+ id+"  for thread: " + name);
+                    }else {
+                        System.out.println("no seat place "+ id+" available for thread: " + name);
+                        output = -1;
+                    }
+                }else {
+                    System.out.println("no seat place "+ id+" available for thread: " + name);
+                }
             }
-
+            return output;
         }
-
-         */
-        return output;
     }
 }
